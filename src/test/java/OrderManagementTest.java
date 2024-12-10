@@ -24,13 +24,14 @@ public class OrderManagementTest {
         cart = new ShoppingCart();
     }
 
+    // test adding to the cart a product out of stock
        @Test
     void testAddProductOutOfStock() {
         Product outOfStockProduct = new Product("Camera", 249.99, 0);
         assertThrows(OutOfStockException.class, () -> cart.addProduct(outOfStockProduct), "Adding an out-of-stock product should throw an exception");
     }
 
-
+    //apply an invalid promotionnal code
     @Test
     void testApplyInvalidPromo() throws OutOfStockException {
         cart.addProduct(laptop);
@@ -53,6 +54,7 @@ public class OrderManagementTest {
         cart.removeProduct(laptop);
         assertEquals(0, cart.getItemCount(), "Cart should be empty after removing the only product");
     }
+    // removing a non existent product
 
     @Test
     void testRemoveNonExistentProduct() {
@@ -67,7 +69,7 @@ public class OrderManagementTest {
         assertThrows(OutOfStockException.class, () -> cart.addProduct(outOfStockProduct), "Adding an out-of-stock product should trigger an exception");
     }
 
-
+    // test invoice without products
     @Test
     void testInvoiceWithOneProduct() throws OutOfStockException {
         cart.addProduct(laptop);
@@ -76,7 +78,7 @@ public class OrderManagementTest {
         String invoiceContent = invoice.generateInvoice();
         assertTrue(invoiceContent.contains("Laptop"), "Invoice should include product details for 'Laptop'");
     }
-
+    // test invoice with plenty of products
     @Test
     void testInvoiceWithMultipleProducts() throws OutOfStockException {
         cart.addProduct(laptop);
@@ -86,9 +88,7 @@ public class OrderManagementTest {
         String invoiceContent = invoice.generateInvoice();
         assertTrue(invoiceContent.contains("Laptop") && invoiceContent.contains("Phone"), "Invoice should include details for multiple products");
     }
-
-
-
+    // test applying a discount
     @Test
     void testOrderReturnsDiscount() throws OutOfStockException, InvalidDiscountCodeException {
         cart.addProduct(laptop);
@@ -96,13 +96,14 @@ public class OrderManagementTest {
         order.applyDiscount("PROMO10");
         assertEquals(0.10, order.getDiscount(), 0.01, "Order should correctly return the applied discount");
     }
-
+    // test order methods that returns the cart
     @Test
     void testOrderReturnsCart() throws OutOfStockException {
         cart.addProduct(laptop);
         order = new Order(cart);
         assertNotNull(order.getShoppingCart(), "Order should return the cart it contains");
     }
+    // test invoice with a 10% discount applied
     @Test
     void testInvoiceIncludesDiscount10() throws OutOfStockException, InvalidDiscountCodeException {
         cart.addProduct(laptop);
@@ -113,6 +114,7 @@ public class OrderManagementTest {
         String invoiceContent = invoice.generateInvoice();
         assertTrue(invoiceContent.contains("Remise: 10,00%"), "Invoice should display the discount percentage when a discount is applied.");
     }
+    // test invoice with a 20% discount applied
     @Test
     void testInvoiceIncludesDiscount20() throws OutOfStockException, InvalidDiscountCodeException {
         cart.addProduct(laptop);
@@ -123,21 +125,21 @@ public class OrderManagementTest {
         String invoiceContent = invoice.generateInvoice();
         assertTrue(invoiceContent.contains("Remise: 20,00%"), "Invoice should display the discount percentage when a discount is applied.");
     }
-
+    // reducing by 1 the quantity of a product
     @Test
     void testDecrementStock() {
         int initialStock = laptop.getStockQuantity();
         laptop.decrementStock();
         assertEquals(initialStock - 1, laptop.getStockQuantity(), "Stock quantity should decrease by 1 after decrementing.");
     }
-
+    //reducing the quantity of a product to 0
     @Test
     void testDecrementStockToZero() {
         laptop = new Product("Laptop", 999.99, 1); // stock = 1
         laptop.decrementStock();
         assertEquals(0, laptop.getStockQuantity(), "Stock quantity should be 0 after decrementing from 1.");
     }
-
+    // reducing the quantity of a product lower to 0
     @Test
     void testDecrementStockWhenEmpty() {
         laptop = new Product("Laptop", 999.99, 0); // stock = 0
